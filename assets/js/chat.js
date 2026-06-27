@@ -926,7 +926,7 @@ keywords:["website banana hai"],
 response:"🌐 Website banane ke liye HTML structure, CSS design aur JavaScript interactivity provide karta hai. Chhote pages se start karna best rahega."
 },
       {
-keywords:["Pari kesharvani kaun hai","Pari kesharwani","pari kesharwani],
+keywords:["Pari kesharvani kaun hai","Pari kesharwani","pari kesharwani"],
 response:"😄 Chilgozi(Pari) Medulla AI ke known circle ka ek member hai. Ye apni friendly nature aur mast sense of humor ke liye jani jati hai. Agar Chilgozi ye padh rahi hai to, productive bhi rehna!"
 },
 
@@ -963,5 +963,5 @@ response:"😊 hello Sir! Aapko dekhkar achha laga.Aap jaise educators hi studen
 keywords:["aapko kisne banaya"],
 response:"🤖 Mujhe AK Industries ne develop kiya hai. Is project ke founder Akshat hain. Mere development mein web technologies, programming logic aur AI concepts ka use kiya gaya hai. Lekin kisi bhi learning project ki tarah, inspiration ka ek hissa teachers aur mentors bhi hote hain."
 }
-
+]
 
