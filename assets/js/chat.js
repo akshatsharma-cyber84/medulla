@@ -15,7 +15,7 @@ let currentSessionId = null;
 
 const knowledgeBase = [
   {
-    keywords: ["medulla", "kaun hai", "who are you", "kon hai", "about yourself", "introduce", "tum kaun"],
+    keywords: ["medulla", "kaun hai", "who are you", "kon hai", "about yourself", "introduce", "tum kaun", "tum kaun ho"],
     response: `Main hoon **Medulla AI** 🧠 — tumhara intelligent AI assistant jo **AK Industries** ne design kiya hai!
 
 ### Meri Capabilities:
@@ -28,7 +28,7 @@ const knowledgeBase = [
 Main Hinglish mein naturally baat karta hoon. Kuch bhi poochho! 🚀`
   },
   {
-    keywords: ["ak industries", "creator", "developer", "kisne banaya", "who made", "who built"],
+    keywords: ["ak industries", "creator", "developer", "kisne banaya", "who made", "who built","tumhe kisne au kaise banaya"],
     response: `Mujhe **AK Industries** ne build kiya hai! 🏢
 
 AK Industries innovative tech solutions aur AI applications develop karti hai.
