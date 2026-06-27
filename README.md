@@ -60,72 +60,6 @@ https://YOUR_USERNAME.github.io/MedullaAI/
 
 ---
 
-## 🗄️ Supabase Database Setup
-
-### Create Tables in Supabase
-
-Go to your Supabase project → **SQL Editor** → Run:
-
-```sql
--- ═══════════════════════════════════════════════════════════════
--- USERS TABLE
--- ═══════════════════════════════════════════════════════════════
-CREATE TABLE users (
-  id BIGSERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  phone_number TEXT NOT NULL UNIQUE,
-  is_admin BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  last_login TIMESTAMPTZ DEFAULT NOW()
-);
-
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public access" ON users FOR ALL USING (true) WITH CHECK (true);
-
--- ═══════════════════════════════════════════════════════════════
--- PREFERENCES TABLE
--- ═══════════════════════════════════════════════════════════════
-CREATE TABLE preferences (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-  preference_key TEXT NOT NULL,
-  preference_value TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-ALTER TABLE preferences ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public access" ON preferences FOR ALL USING (true) WITH CHECK (true);
-
--- ═══════════════════════════════════════════════════════════════
--- MEMORY TABLE
--- ═══════════════════════════════════════════════════════════════
-CREATE TABLE memory (
-  id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-  memory_title TEXT NOT NULL,
-  memory_content TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-ALTER TABLE memory ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public access" ON memory FOR ALL USING (true) WITH CHECK (true);
-
--- ═══════════════════════════════════════════════════════════════
--- INDEXES
--- ═══════════════════════════════════════════════════════════════
-CREATE INDEX idx_users_phone ON users(phone_number);
-CREATE INDEX idx_preferences_user ON preferences(user_id);
-CREATE INDEX idx_memory_user ON memory(user_id);
-```
-
-### Current Configuration
-```
-Project URL: https://zilotvwgpbkbmtakfevy.supabase.co
-Anon Key: Already configured in config.js
-```
-
----
-
 ## 🤖 GPT API Integration
 
 ### Architecture
@@ -193,43 +127,6 @@ GPT_API_ENDPOINT: "https://your-proxy.vercel.app/api/chat"
 
 ---
 
-## 🔐 Security Features
-
-### Admin Access
-- **Phone:** 8601264402
-- Bypasses Formspree registration
-- No UI indicators (silent)
-
-### Formspree Deduplication
-- New users → Send to Formspree
-- Returning users → Skip (no duplicates)
-
-### API Key Protection
-- OpenAI keys: Server-side only (proxy)
-- Supabase anon key: Safe for frontend (RLS enabled)
-
----
-
-## ✨ Features
-
-| Feature | Status |
-|---------|--------|
-| GitHub Pages Compatible | ✅ |
-| Single index.html Entry | ✅ |
-| Supabase Integration | ✅ |
-| Formspree (No Duplicates) | ✅ |
-| Admin Bypass | ✅ |
-| GPT API Ready | ✅ |
-| Internal Knowledge Base | ✅ |
-| Hinglish Responses | ✅ |
-| Premium 2026 UI | ✅ |
-| Mouse-Reactive Glow | ✅ |
-| Chat History | ✅ |
-| Memory System | ✅ |
-| Code Highlighting | ✅ |
-| Responsive Design | ✅ |
-
----
 
 ## 🔧 Customization
 
