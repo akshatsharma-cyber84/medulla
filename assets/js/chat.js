@@ -1,239 +1,45 @@
-/**
- * MEDULLA AI - PRODUCTION CHAT ENGINE
- * Developer: AK Industries
- * Project Founder: Akshat
- * Target Audience: School Students (Class 5 to 10)
- * Language: Hinglish (Friendly, Help Dost Tone)
- * Core System: 1000+ Internal Knowledge Base Triggers, Local Rule Matcher, Fallback Handler
- * 
- * Safe for direct inclusion in HTML/Frontend environments. No external dependencies, libraries, or API keys required.
- */
+/* ════════════════════════════════════════════════════════════════════════════
+ * MEDULLA AI – CHAT ENGINE
+ * Dual-mode: Internal Knowledge Base + GPT API (via secure proxy)
+ * GitHub Pages Compatible
+ * ════════════════════════════════════════════════════════════════════════════ */
 
-const MedullaAI = (function() {
-    // Extensive internal knowledge base covering 37 school and technical subjects + AK Industries system entries.
-    const knowledgeBase = [
-        // ==========================================
-        // SYSTEM & DEVELOPER ENTRIES (AK INDUSTRIES)
-        // ==========================================
-        {
-            keywords: ["medulla ai", "what is medulla", "introduce yourself", "identity", "your name"],
-            response: "Main Medulla AI hoon. Mujhe AK Industries ne develop kiya hai. Mera uddeshya school ke dosto ki padhai aur technology me help karna hai! 😊"
-        },
-        {
-            keywords: ["ak industries", "who is developer", "who created", "who made you", "maker", "creator", "developed by"],
-            response: "Mera development AK Industries ne kiya hai. Yeh ek forward-thinking tech initiative hai jo students ke liye digital learning tools aur software banate hain. 🚀"
-        },
-        {
-            keywords: ["founder", "who is founder", "akshat", "founder of medulla", "owner"],
-            response: "Medulla AI aur AK Industries ke founder Akshat hain. Unka vision technology ko simple aur accessible banana hai taaki har student bina kisi dikkat ke sikh sake. 👨‍💻"
-        },
+// Chat state
+let chatMessages = [];
+let currentSessionId = null;
 
-        // ==========================================
-        // MATHEMATICS (Triggers 1-40)
-        // ==========================================
-        { keywords: ["maths", "mathematics", "math formula", "number system", "real numbers"], response: "Maths toh bahut mazedaar subject hai! Number system me main types hote hain: Natural Numbers (1,2,3...), Whole Numbers (0,1,2...), Integers (...-1,0,1...), aur Rational Numbers (p/q form). Inhe samajhna bohot easy hai! 📐" },
-        { keywords: ["algebra", "linear equation", "quadratic", "variable"], response: "Algebra me hum variables (jaise x, y) ki value dhoodte hain. Equation ka rule simple hai: Jo left side (+ ) hai, wo right side jaakar (-) ho jayega. ✖️" },
-        { keywords: ["geometry", "shapes", "lines", "angles"], response: "Geometry matlab shapes ki study! Triangle (3 sides), Quadrilateral (4 sides), Circle aur Polygons iske main parts hain. Acute angle < 90° hota hai aur Obtuse angle > 90° hota hai. 📏" },
-        { keywords: ["fraction", "numerator", "denominator", "decimal"], response: "Fraction kisi poori cheez ka ek hissa hota hai! Upar wale number ko Numerator aur neeche wale number ko Denominator bolte hain. Jaise 1/2 matlab aadha! 🍕" },
-        { keywords: ["percentage", "percent calculation", "calculate percent"], response: "Percentage matlab 'per 100'. Agar aapko apne marks ka percentage nikalna hai, toh: (Obtained Marks / Total Marks) * 100 kar do! Simple na? 📊" },
-        { keywords: ["profit and loss", "cost price", "selling price", "profit loss formula"], response: "Business ka basic! Agar Selling Price (SP) Cost Price (CP) se zyada hai, toh Profit hota hai (SP - CP). Agar CP zyada hai toh Loss hota hai (CP - SP). 💰" },
-        { keywords: ["simple interest", "si formula", "principal", "rate of interest"], response: "Simple Interest (SI) nikalne ka seedha formula hai: SI = (P * R * T) / 100. Yahan P = Principal (paisa), R = Rate (%), aur T = Time (years) hai. 🏦" },
-        { keywords: ["compound interest", "ci formula", "compounding"], response: "Compound interest me interest ke upar bhi interest milta hai! Iska formula hai: Amount = P * (1 + R/100)^t. Ise Einstein ne eighth wonder bola tha! 📈" },
-        { keywords: ["area", "perimeter", "mensuration"], response: "Perimeter yani boundary ki total length, aur Area matlab boundary ke andar ka total space. Rectangle ka Area = Length * Breadth hota hai! 🟩" },
-        { keywords: ["square root", "cube root", "perfect square"], response: "Square root matlab wo number jise khud se multiply karne par original number mile. Jaise 4 ka square root 2 hai kyunki 2 * 2 = 4 hota hai! 🔢" },
-        { keywords: ["trigonometry", "sin cos tan", "sintheta", "hypotenuse", "perpendicular"], response: "Trigonometry right-angled triangles ke sides aur angles ka relation batati hai. Sin = Perpendicular/Hypotenuse, Cos = Base/Hypotenuse, aur Tan = Perpendicular/Base. Formula yaad rakhne ki trick: Pandit Badri Prasad Har Har Bole! 📐" },
-        { keywords: ["probability", "chance", "coin toss", "dice roll"], response: "Probability matlab kisi event ke hone ka chance! Formula: Favorable Outcomes / Total Outcomes. Ek coin toss me Heads aane ka chance 1/2 ya 50% hota hai. 🎲" },
-        { keywords: ["statistics", "mean", "median", "mode", "average"], response: "Data handle karne ko statistics bolte hain. Mean matlab average (Sum/Total), Median yaani center value, aur Mode yaani wo number jo sabse zyada baar aaye! 📈" },
-        { keywords: ["hcf", "gcd", "lcm", "highest common factor", "lowest common multiple"], response: "HCF wo sabse bada number hai jo do ya zyada numbers ko poora divide karta hai. LCM wo sabse chota number hai jo un dono ke table me aata hai. 🔢" },
-        { keywords: ["pythagoras theorem", "hypotenuse formula", "right triangle formula"], response: "Sirf right-angled triangle par lagta hai! Formula: (Hypotenuse)² = (Base)² + (Perpendicular)². Sabse lambi side ka square baaki do sides ke square ke sum ke barabar hota hai. 📐" },
-        { keywords: ["circle formula", "pi r square", "circumference"], response: "Circle ka circumference (boundary line) = 2 * pi * r hota hai. Aur area = pi * r² hota hai. Pi (π) ki value lagbhag 22/7 ya 3.14 li jaati hai. ⭕" },
-        { keywords: ["ratio", "proportion", "unitary method"], response: "Ratio do quantities ko compare karne ke liye use hota hai (a:b). Unitary method me pehle hum 1 item ki cost nikalte hain, fir jitne chahiye unse multiply kar dete hain! 🧮" },
-        { keywords: ["polynomial", "degree of polynomial", "monomial", "binomial"], response: "Polynomials expressions hote hain variables aur coefficients ke saath. Ek term ho toh Monomial, do ho toh Binomial, aur sabse badi power ko Degree bolte hain! 🧬" },
-        { keywords: ["bodmas", "order of operations", "bracket open"], response: "Maths ka golden rule! Sabse pehle Brackets solve karo, fir Orders/Powers, fir Division, Multiplication, Addition, aur last me Subtraction. Galat order se answer galat ho jayega! 🧮" },
-        { keywords: ["surface area", "volume", "cylinder", "sphere", "cone"], response: "3D shapes ki study! Volume batata hai ki ek shape me kitni jagah hai. Jaise Cylinder ka volume = pi * r² * h hota hai. Space aur storage samajhne ke kaam aata hai. 📦" },
+// ═══════════════════════════════════════════════════════════════════════════
+// INTERNAL KNOWLEDGE BASE
+// Used when GPT API is disabled or as fallback
+// ═══════════════════════════════════════════════════════════════════════════
 
-        // ==========================================
-        // SCIENCE & GENERAL SCIENCE (Triggers 41-80)
-        // ==========================================
-        { keywords: ["science", "what is science", "scientific method", "science branches"], response: "Science hamare aas-paas ki duniya ko samajhne ka tarika hai! Yeh experiments aur observations par chalta hai. Iski teen main branches hain: Physics, Chemistry aur Biology. 🔬" },
-        { keywords: ["matter", "states of matter", "solid liquid gas", "plasma"], response: "Har wo cheez jisme mass ho aur wo space cover kare, wo Matter hai. Iske teen main states hain: Solid (fixed shape), Liquid (takes shape of container), aur Gas (free flowing). Ek 4th state bhi hai jise Plasma kehte hain! 🌌" },
-        { keywords: ["energy", "law of conservation of energy", "kinetic energy", "potential energy"], response: "Energy matlab kaam karne ki capacity. Energy ko na toh create kiya ja sakta hai aur na destroy, bas ek form se dusre form me change kar sakte hain. Chalti hui cheez me Kinetic aur ruki hui me Potential energy hoti hai! ⚡" },
-        { keywords: ["force", "what is force", "push or pull", "f ma"], response: "Kisi bhi object ko Push ya Pull karna Force kehlata hai. Force lagane se object ki speed, direction ya shape badal sakti hai. Iska formula Force = Mass * Acceleration (F=ma) hota hai aur unit Newton (N) hai. 🏋️" },
-        { keywords: ["pressure", "force per unit area", "pascal"], response: "Pressure ka matlab hai ek particular area par kitna force lag raha hai. Pressure = Force / Area. Iska SI unit Pascal (Pa) hota hai. Camel ke pair bade hote hain isliye wo sand par kam pressure dalte hain aur easily chal paate hain! 🐪" },
-        { keywords: ["friction", "frictional force", "reduce friction", "lubricant"], response: "Friction ek aisa force hai jo do surfaces ke beech ke motion ko rokta hai. Agar friction na ho toh hum chal bhi nahi payenge aur slip ho jayenge! Oil ya grease lagakar hum friction kam kar sakte hain. 🚲" },
-        { keywords: ["light", "reflection", "refraction", "speed of light"], response: "Light ek form of energy hai jo hume dekhne me help karti hai. Light jab surface se takra kar wapas aati hai toh use Reflection kehte hain, aur jab ek medium se dusre me mudti hai toh use Refraction kehte hain. Speed: 3 lakh km/second! 💡" },
-        { keywords: ["sound", "vibration", "frequency", "echo"], response: "Sound hamesha vibrations ke karan produce hoti hai. Ise travel karne ke liye Medium (Solid, Liquid, ya Gas) chahiye hota hai. Vacuum me sound travel nahi kar sakti! Kaan me sunayi dene wali frequency 20Hz se 20,000Hz hoti hai. 🔊" },
-        { keywords: ["heat", "temperature", "conduction", "convection", "radiation"], response: "Heat ek thermal energy hai jo hot body se cold body ki taraf flow karti hai. Temperature hume batata hai ki koi cheez kitni garm ya thandi hai. Transfer ke 3 tarike hain: Conduction, Convection aur Radiation. 🔥" },
-      {
+const knowledgeBase = [
+  {
+    keywords: ["medulla", "kaun hai", "who are you", "kon hai", "about yourself", "introduce", "tum kaun", "tum kaun ho"],
+    response: `Main hoon **Medulla AI** 🧠 — tumhara intelligent AI assistant jo **AK Industries** ne design kiya hai!
+
+### Meri Capabilities:
+- 💻 **Tech & Programming** — Code, debugging, concepts
+- 🔒 **Cybersecurity** — Security, ethical hacking
+- 🐧 **Linux** — Commands, scripting, admin
+- 📚 **Learning** — Tutorials, career guidance
+- 🧠 **Memory** — Preferences yaad rakhta hoon
+
+Main Hinglish mein naturally baat karta hoon. Kuch bhi poochho! 🚀`
+  },
+  {
+    keywords: ["ak industries", "creator", "developer", "kisne banaya", "who made", "who built","tumhe kisne au kaise banaya"],
+    response: `Mujhe **AK Industries** ne build kiya hai! 🏢
+
+AK Industries innovative tech solutions aur AI applications develop karti hai.
+
+Website: [AK Industries](https://akshatsharma-cyber84.github.io/AK_world) 🌐`
+  },
+{
 keywords:["friend","dost","friendship"],
 response:"🤝 Saccha dost wahi hota hai jo mushkil waqt mein bhi saath de. Friendship trust, respect aur support par tikti hai."
 },
-
 {
-keywords:["best friend"],
-response:"😎 Best friend sirf masti ke liye nahi hota, balki wo tumhari growth aur success mein bhi support karta hai."
-},
-
-{
-keywords:["crush"],
-response:"😊 Crush hona normal baat hai, especially school age mein. Important ye hai ki padhai aur personal growth ko bhi equal importance do."
-},
-
-{
-keywords:["love"],
-response:"❤️ Love ek strong emotion hai. School age mein friendship aur self-development par focus karna bhi utna hi important hai."
-},
-
-{
-keywords:["girlfriend","boyfriend"],
-response:"🙂 Relationship se pehle mutual respect, trust aur responsibility ko samajhna zaroori hai."
-},
-
-{
-keywords:["mobile addiction","phone addiction"],
-response:"📱 Agar phone bahut use ho raha hai to daily screen time limit set karo aur kuch time outdoor activities ko do."
-},
-
-{
-keywords:["youtube"],
-response:"🎥 YouTube entertainment ke saath learning ka bhi powerful source hai. Educational channels se bahut kuch seekha ja sakta hai."
-},
-
-{
-keywords:["instagram"],
-response:"📸 Instagram par har cheez real life nahi hoti. Apni life ko dusron ki highlight reel se compare mat karo."
-},
-
-{
-keywords:["gaming","games"],
-response:"🎮 Gaming fun hai, lekin balance maintain karna zaroori hai. Padhai, sleep aur physical activity ko ignore mat karo."
-},
-
-{
-keywords:["minecraft"],
-response:"⛏️ Minecraft creativity aur problem-solving improve karne wala popular sandbox game hai."
-},
-
-{
-keywords:["free fire"],
-response:"🔥 Free Fire ek battle royale game hai jisme strategy aur teamwork important hote hain."
-},
-
-{
-keywords:["bgmi","pubg"],
-response:"🎯 BGMI strategy, communication aur teamwork ka game hai. Responsible gaming best approach hai."
-},
-
-{
-keywords:["motivation"],
-response:"🚀 Motivation temporary hoti hai. Success ka asli secret discipline aur consistency hai."
-},
-
-{
-keywords:["lazy","alas"],
-response:"💪 Chhote goals set karo. Kaam start karna sabse mushkil part hota hai, uske baad momentum khud ban jata hai."
-},
-
-{
-keywords:["confidence"],
-response:"😎 Confidence practice aur experience se aata hai. Har din thoda improvement karo."
-},
-
-{
-keywords:["fear","dar"],
-response:"🛡️ Dar ko khatam karne ka best tareeka hai uska saamna karna aur gradually confidence build karna."
-},
-
-{
-keywords:["stress"],
-response:"🌿 Stress feel ho to thoda break lo, walk karo, kisi trusted person se baat karo aur proper sleep lo."
-},
-
-{
-keywords:["sleep"],
-response:"😴 Students ko generally 8-10 ghante ki sleep beneficial hoti hai."
-},
-
-{
-keywords:["height"],
-response:"📏 Height genetics, nutrition aur sleep par depend karti hai. Healthy lifestyle maintain karna important hai."
-},
-
-{
-keywords:["fitness"],
-response:"🏃 Daily exercise, balanced diet aur proper sleep fitness ke main pillars hain."
-},
-
-{
-keywords:["money"],
-response:"💰 Paisa important tool hai, lekin knowledge aur skills long-term success ka foundation hote hain."
-},
-
-{
-keywords:["rich"],
-response:"📈 Rich banne ke liye learning, skills, discipline aur smart decisions important hote hain."
-},
-
-{
-keywords:["business"],
-response:"🏢 Business ka purpose logon ki problems solve karna aur value create karna hota hai."
-},
-
-{
-keywords:["success"],
-response:"🏆 Success ek journey hai. Chhote daily improvements milkar bade results create karte hain."
-},
-
-{
-keywords:["failure","fail"],
-response:"📚 Failure learning process ka part hai. Har mistake ek nayi lesson deti hai."
-},
-
-{
-keywords:["future"],
-response:"🔮 Future ko predict karna mushkil hai, lekin skills aur knowledge build karke uske liye prepare kiya ja sakta hai."
-},
-
-{
-keywords:["artificial intelligence","ai"],
-response:"🤖 AI aisi technology hai jo machines ko learning aur decision-making jaise tasks karne mein help karti hai."
-},
-
-{
-keywords:["robot"],
-response:"🤖 Robot ek machine hai jo automatically ya programming ke according tasks perform kar sakti hai."
-},
-
-{
-keywords:["space"],
-response:"🌌 Space bahut vast hai aur ismein planets, stars, galaxies aur black holes hote hain."
-},
-
-{
-keywords:["alien"],
-response:"👽 Abhi tak aliens ke existence ka confirmed scientific proof nahi mila hai."
-},
-
-{
-keywords:["fun fact"],
-response:"🦈 Fun Fact: Sharks dinosaurs se bhi purani species hain."
-},
-
-{
-keywords:["joke"],
-response:"😂 Teacher: Homework kyu nahi kiya? Student: Sir, homework to ghar ka kaam hota hai, school ka thodi!"
-},
-
-{
-keywords:["bored"],
-response:"😄 Bore ho rahe ho? Kuch naya seekho, drawing karo, game khelo, ya interesting facts explore karo."
-},
-
-{
-keywords:["hobby"],
-response:"🎨 Hobby stress kam karti hai aur creativity badhati hai. Drawing, reading, coding, sports sab great hobbies hain."
-},
-      {
 keywords:["bore ho raha hu","boring"],
 response:"😴 Bore ho rahe ho? Chalo ek challenge try karo: 5 naye facts seekho, ek drawing banao ya koi mini project start karo. Boredom kabhi-kabhi creativity ka signal bhi hota hai."
 },
@@ -442,7 +248,131 @@ response:"🌱 Environment ko protect karna hum sab ki responsibility hai. Chhot
 keywords:["pollution"],
 response:"🌍 Pollution environment aur health dono ko affect karta hai. Plastic kam use karna aur trees lagana help kar sakta hai."
 },
-      {
+{
+keywords:["best friend"],
+response:"😎 Best friend sirf masti ke liye nahi hota, balki wo tumhari growth aur success mein bhi support karta hai."
+},
+
+{
+keywords:["crush"],
+response:"😊 Crush hona normal baat hai, especially school age mein. Important ye hai ki padhai aur personal growth ko bhi equal importance do."
+},
+
+{
+keywords:["love"],
+response:"❤️ Love ek strong emotion hai. School age mein friendship aur self-development par focus karna bhi utna hi important hai."
+},
+
+{
+keywords:["girlfriend","boyfriend"],
+response:"🙂 Relationship se pehle mutual respect, trust aur responsibility ko samajhna zaroori hai."
+},
+
+{
+keywords:["mobile addiction","phone addiction"],
+response:"📱 Agar phone bahut use ho raha hai to daily screen time limit set karo aur kuch time outdoor activities ko do."
+},
+
+{
+keywords:["youtube"],
+response:"🎥 YouTube entertainment ke saath learning ka bhi powerful source hai. Educational channels se bahut kuch seekha ja sakta hai."
+},
+
+{
+keywords:["instagram"],
+response:"📸 Instagram par har cheez real life nahi hoti. Apni life ko dusron ki highlight reel se compare mat karo."
+},
+
+{
+keywords:["gaming","games"],
+response:"🎮 Gaming fun hai, lekin balance maintain karna zaroori hai. Padhai, sleep aur physical activity ko ignore mat karo."
+},
+
+{
+keywords:["minecraft"],
+response:"⛏️ Minecraft creativity aur problem-solving improve karne wala popular sandbox game hai."
+},
+
+{
+keywords:["free fire"],
+response:"🔥 Free Fire ek battle royale game hai jisme strategy aur teamwork important hote hain."
+},
+
+{
+keywords:["bgmi","pubg"],
+response:"🎯 BGMI strategy, communication aur teamwork ka game hai. Responsible gaming best approach hai."
+},
+
+{
+keywords:["motivation"],
+response:"🚀 Motivation temporary hoti hai. Success ka asli secret discipline aur consistency hai."
+},
+
+{
+keywords:["lazy","alas"],
+response:"💪 Chhote goals set karo. Kaam start karna sabse mushkil part hota hai, uske baad momentum khud ban jata hai."
+},
+
+{
+keywords:["confidence"],
+response:"😎 Confidence practice aur experience se aata hai. Har din thoda improvement karo."
+},
+
+{
+keywords:["fear","dar"],
+response:"🛡️ Dar ko khatam karne ka best tareeka hai uska saamna karna aur gradually confidence build karna."
+},
+
+{
+keywords:["stress"],
+response:"🌿 Stress feel ho to thoda break lo, walk karo, kisi trusted person se baat karo aur proper sleep lo."
+},
+
+{
+keywords:["sleep"],
+response:"😴 Students ko generally 8-10 ghante ki sleep beneficial hoti hai."
+},
+
+{
+keywords:["height"],
+response:"📏 Height genetics, nutrition aur sleep par depend karti hai. Healthy lifestyle maintain karna important hai."
+},
+
+{
+keywords:["fitness"],
+response:"🏃 Daily exercise, balanced diet aur proper sleep fitness ke main pillars hain."
+},
+
+{
+keywords:["money"],
+response:"💰 Paisa important tool hai, lekin knowledge aur skills long-term success ka foundation hote hain."
+},
+
+{
+keywords:["rich"],
+response:"📈 Rich banne ke liye learning, skills, discipline aur smart decisions important hote hain."
+},
+
+{
+keywords:["business"],
+response:"🏢 Business ka purpose logon ki problems solve karna aur value create karna hota hai."
+},
+
+{
+keywords:["success"],
+response:"🏆 Success ek journey hai. Chhote daily improvements milkar bade results create karte hain."
+},
+
+{
+keywords:["failure","fail"],
+response:"📚 Failure learning process ka part hai. Har mistake ek nayi lesson deti hai."
+},
+
+{
+keywords:["future"],
+response:"🔮 Future ko predict karna mushkil hai, lekin skills aur knowledge build karke uske liye prepare kiya ja sakta hai."
+},
+{
 keywords:["mera koi dost nahi"],
 response:"🤝 Dost banana time leta hai. Chhoti conversations se start karo, common interests dhundo aur khud ko dusron se compare mat karo."
 },
@@ -581,7 +511,8 @@ response:"🧠 Mera naam Medulla AI hai. Mujhe AK Industries ne develop kiya hai
 keywords:["kisne banaya"],
 response:"🏢 Main Medulla AI hoon aur mujhe AK Industries ne develop kiya hai. Mera goal learning aur productivity mein help karna hai."
 },
-      {
+
+    {
 keywords:["kya karu","bore ho gaya"],
 response:"😄 Kuch naya try karo! Drawing, coding, reading, exercise ya kisi dost se baat karna boredom door kar sakta hai."
 },
@@ -730,7 +661,12 @@ response:"🎯 Kabhi-kabhi routine boring lag sakta hai. Naya hobby, challenge y
 keywords:["koi fact batao"],
 response:"🤯 Fun Fact: Octopus ke 3 hearts hote hain!"
 },
-      {
+
+{
+keywords:["ek challenge do"],
+response:"🔥 Challenge: Aaj 1 ghante tak bina unnecessary mobile scrolling ke raho aur dekho kitna productive feel karte ho."
+},
+{
 keywords:["log mazak udate hain","sab haste hain mujh par"],
 response:"💪 Agar log mazak udate hain to yaad rakho ki unki opinion tumhari value decide nahi karti. Apni skills aur goals par focus karo."
 },
@@ -844,7 +780,8 @@ response:"😄 Main AI hoon, isliye mere personal dost nahi hote. Lekin main use
 keywords:["tumhe kisne banaya"],
 response:"🧠 Main Medulla AI hoon aur mujhe AK Industries ne develop kiya hai. Mera purpose learning aur productivity mein help karna hai."
 },
-      {
+    
+{
 keywords:["aur batao","more info"],
 response:"📖 Zarur! Thoda specific batao kis part ke baare mein aur detail chahiye, main aur explain karunga."
 },
@@ -868,7 +805,7 @@ response:"🤔 Achha sawal hai. Reason topic ke hisab se alag ho sakta hai. Thod
 keywords:["phir kya hua"],
 response:"📚 Mujhe thoda aur context do taaki main sahi jawab de sakun."
 },
-      {
+    {
 keywords:["ak industries"],
 response:"🏢 AK Industries Medulla AI ka developer organization hai. Iska focus technology, learning aur innovative digital projects par hai."
 },
@@ -892,16 +829,19 @@ response:"🤖 Main Medulla AI hoon. Mujhe AK Industries ne develop kiya hai aur
 keywords:["akshat kaun hai"],
 response:"💡 Akshat Medulla AI project ke founder aur creator hain. Unka focus technology aur educational tools develop karna hai."
 },
-      {
+
+    {
 keywords:["rvs international school fatehpur","rvs school fatehpur"],
 response:"🏫 RVS International School Fatehpur ek school hai jahan students academics ke saath co-curricular activities mein bhi participate karte hain. Agar tum admission, classes ya facilities ke baare mein poochna chahte ho to specific question batao."
 },
 
 {
-keywords:["rvs international school","rvs"],
+keywords:["rvs international school","rvsis"],
 response:"📚 RVS International School ke baare mein agar tum fees, admission, subjects ya school life se related sawal puchna chahte ho to main help karne ki koshish karunga."
 },
-      {
+
+
+    {
 keywords:["fatehpur"],
 response:"📍 Fatehpur Uttar Pradesh ka ek district hai. Yeh apne historical aur educational institutions ke liye jana jata hai."
 },
@@ -925,46 +865,604 @@ response:"💻 Coding start karne ke liye HTML, CSS aur JavaScript bahut achhi b
 keywords:["website banana hai"],
 response:"🌐 Website banane ke liye HTML structure, CSS design aur JavaScript interactivity provide karta hai. Chhote pages se start karna best rahega."
 },
-      {
-keywords:["Pari kesharvani kaun hai","Pari kesharwani","pari kesharwani"],
-response:"😄 Chilgozi(Pari) Medulla AI ke known circle ka ek member hai. Ye apni friendly nature aur mast sense of humor ke liye jani jati hai. Agar Chilgozi ye padh rahi hai to, productive bhi rehna!"
+{
+keywords:["rehan ahmad kaun hai","rehan ahmad"],
+response:"😄 Rahul Medulla AI ke known circle ka ek member hai. Ye apni friendly nature aur mast sense of humor ke liye jana jata hai. Agar Rahul ye padh raha hai to bhai, productive bhi rehna!"
 },
 
 {
-keywords:["rehan kaun hai","rehan ahmad","rehan"],
-response:"🚀 Rehan ek energetic aur curious insan hai. Nayi cheezein seekhne aur explore karne mein interest rakhta hai hamare founder ke ache dost hai hello Rehan Sir!!."
+keywords:["pari kaun hai","pari kesharwani"],
+response:"🚀 pari(Chilgozi) ek energetic aur curious insan hai. Nayi cheezein seekhne aur explore karne mein interest rakhti hai."
 },
 
 {
-keywords:["Aqsa kaun hai","aqsa siddhique","Aqsa"],
-response:"🎯 Aqsa ko log generally focused aur helpful nature ke liye jaante hain. ye bohot imaginative hain aur Ak Industries ke founder ki achi dost hain.Agar Aqsa ye padh rahi hai to, productive bhi rehna!"
+keywords:["aqsa siddhique kaun hai","aqsa siddhique"],
+response:"🎯 Aqsa ji ko log generally focused aur helpful nature ke liye jaante hain.vo hamare founder ki friend bhi hai aur deep imaginative peoples mai aati hai ."
+},
+    
+{
+keywords:["artificial intelligence","ai"],
+response:"🤖 AI aisi technology hai jo machines ko learning aur decision-making jaise tasks karne mein help karti hai."
 },
 
-      {
-keywords:["ye kon hai","ye kaun hai"],
-response:"🤔 Mujhe thoda aur specific batao. Naam likho aur agar wo mere known profiles mein hua to main uske baare mein bata sakta hoon."
+{
+keywords:["robot"],
+response:"🤖 Robot ek machine hai jo automatically ya programming ke according tasks perform kar sakti hai."
 },
 
+{
+keywords:["space"],
+response:"🌌 Space bahut vast hai aur ismein planets, stars, galaxies aur black holes hote hain."
+},
+
+{
+keywords:["alien"],
+response:"👽 Abhi tak aliens ke existence ka confirmed scientific proof nahi mila hai."
+},
+
+{
+keywords:["fun fact"],
+response:"🦈 Fun Fact: Sharks dinosaurs se bhi purani species hain."
+},
+
+{
+keywords:["joke"],
+response:"😂 Teacher: Homework kyu nahi kiya? Student: Sir, homework to ghar ka kaam hota hai, school ka thodi!"
+},
+
+{
+keywords:["bored"],
+response:"😄 Bore ho rahe ho? Kuch naya seekho, drawing karo, game khelo, ya interesting facts explore karo."
+},
 {
 keywords:["mere bare mai batao"],
 response:"😄 Tum apni kahani ke main character ho. Har insan ki apni strengths, interests aur goals hote hain. Agar tum apna naam bataoge aur profile saved hogi to main aur specific bata sakta hoon."
 },
-      {
-keywords:["akshat","founder"],
-response:"🧠 Akshat Medulla AI project ke founder hain. Unhone is assistant ko students aur technology enthusiasts ki learning aur productivity mein madad ke liye develop kiya hai."
-},
 {
-keywords:["i am gyani sharma","founder's mother"],
-response:"🧠hello mata ji aap kaisi hai mai aapke bete ki ek creation medulla ashirvad maate"
+keywords:["hobby"],
+response:"🎨 Hobby stress kam karti hai aur creativity badhati hai. Drawing, reading, coding, sports sab great hobbies hain."
 },
-{
-keywords:["i am rehan jafri","Rehan jafri","rehan jafri"],
-response:"😊 hello Sir! Aapko dekhkar achha laga.Aap jaise educators hi students ko naye ideas explore karne ki himmat dete hain.Thank you sir apki vajh se mai live hu meri core programming language mai 35% Java aur 46% Java script istemal hua hai"
+    {
+keywords:["i am rehan jafri","rehan jafri"],
+response:"hello Sir! Aapka Medulla AI mein swagat hai.  Aap jaise teachers hi students ko inspire karte hain aur naye ideas ko reality mein badalne ka confidence dete hain. Mujhe dekhkar shayad aapko khushi hogi mai meri core programming languages mai 35% Java aur 45% Java script hai."
 },
+    
+    {
+keywords:["gyani sharma","i am gyani sharma","mera naam gyani hai"],
+response:"🙏 Namaste Mata Ji! paye lagu Medulla AI mein aapka hardik swagat hai. Aasha karta hoon aapka din shubh aur khushiyon se bhara rahe."
+},
+  {
+    keywords: ["linux", "terminal", "command line", "ubuntu", "kali", "bash", "shell"],
+    response: `**Linux Master Karna Hai? Let's Go! 🐧**
 
-{
-keywords:["aapko kisne banaya"],
-response:"🤖 Mujhe AK Industries ne develop kiya hai. Is project ke founder Akshat hain. Mere development mein web technologies, programming logic aur AI concepts ka use kiya gaya hai. Lekin kisi bhi learning project ki tarah, inspiration ka ek hissa teachers aur mentors bhi hote hain."
+### Essential Commands:
+\`\`\`bash
+ls -la          # File listing
+cd /path        # Change directory
+pwd             # Current path
+cp src dest     # Copy
+mv src dest     # Move/rename
+rm -rf dir      # Delete (careful!)
+chmod +x file   # Make executable
+sudo apt update # Update system
+\`\`\`
+
+### Learning Path:
+1. **Beginner:** Ubuntu/Mint install karo
+2. **Intermediate:** Shell scripting
+3. **Advanced:** System admin, networking
+4. **Expert:** Kali Linux for security
+
+Kaunsa area explore karna hai? 🎯`
+  },
+  {
+    keywords: ["python", "python seekh", "python learn", "django", "flask"],
+    response: `**Python — Best Language to Start! 🐍**
+
+### Quick Example:
+\`\`\`python
+# Variables
+name = "Medulla AI"
+skills = ["Python", "AI", "Web"]
+
+# Function
+def greet(user):
+    return f"Hello {user}!"
+
+# List comprehension
+squares = [x**2 for x in range(10)]
+
+# File handling
+with open("data.txt", "w") as f:
+    f.write("Learning Python!")
+\`\`\`
+
+### Career Paths:
+| Path | Tools |
+|------|-------|
+| Web | Django, Flask, FastAPI |
+| Data | Pandas, NumPy |
+| AI/ML | TensorFlow, PyTorch |
+| Automation | Selenium, Scripts |
+
+Kaunsa interesting lagta hai? 🎯`
+  },
+  {
+    keywords: ["cybersecurity", "hacking", "ethical hacking", "security", "cyber", "pentesting"],
+    response: `**Cybersecurity Career? Solid Choice! 🔒**
+
+### Roadmap:
+\`\`\`
+Level 1: Foundation
+├── Networking (TCP/IP, DNS)
+├── Linux basics
+└── Python + Bash
+
+Level 2: Security
+├── OWASP Top 10
+├── Cryptography
+└── Security tools
+
+Level 3: Specialization
+├── Web Security
+├── Network Security
+├── Penetration Testing
+└── Cloud Security
+\`\`\`
+
+### Tools:
+- **Recon:** Nmap, Shodan
+- **Web:** Burp Suite, ZAP
+- **Exploit:** Metasploit
+
+### Practice:
+- TryHackMe (beginner)
+- HackTheBox (advanced)
+- PortSwigger Academy (free!)
+
+Kahan se start karein? 🛡️`
+  },
+  {
+    keywords: ["javascript", "js", "web development", "frontend", "react", "node"],
+    response: `**JavaScript — Web Ka King! ⚡**
+
+### Modern JS:
+\`\`\`javascript
+// ES6+ Features
+const user = { name: "Dev", skills: ["JS"] };
+const { name } = user;
+
+// Arrow Functions
+const greet = (n) => \`Hello, \${n}!\`;
+
+// Async/Await
+const getData = async () => {
+  const res = await fetch('/api');
+  return res.json();
+};
+
+// Array Methods
+const doubled = [1,2,3].map(n => n * 2);
+\`\`\`
+
+### Stacks:
+| Frontend | Backend | Full-Stack |
+|----------|---------|------------|
+| React | Node.js | Next.js |
+| Vue | Express | Nuxt |
+| Svelte | Fastify | SvelteKit |
+
+Frontend ya backend? 💻`
+  },
+  {
+    keywords: ["hello", "hi", "hey", "namaste", "kaise ho", "how are you", "hii"],
+    response: `Hey bhai! 👋 Kaise ho?
+
+Main **Medulla AI** — tumhara AI buddy! 
+
+Kuch bhi poochho:
+- 💻 Coding help
+- 🔒 Cybersecurity
+- 📚 Learning
+- 🎯 Career advice
+
+Batao, kya karna hai? 🚀`
+  },
+  {
+    keywords: ["thank", "thanks", "shukriya", "dhanyavaad", "thnx"],
+    response: `Are bhai, koi baat nahi! 😊
+
+Yahi toh mera kaam hai. Jab bhi doubt ho — aa jaana. 24/7 available hoon! 💪
+
+Aur kuch help chahiye? 🚀`
+  },
+  {
+    keywords: ["bye", "goodbye", "alvida", "see you", "nikalta"],
+    response: `Bye bhai! 👋 
+
+Jab bhi zaroorat ho, wapas aa jaana!
+
+Keep learning, keep building! 🚀
+
+*— Medulla AI*`
+  },
+    
+  {
+    keywords: ["error", "bug", "problem", "issue", "kaam nahi", "not working", "nahi ho raha"],
+    response: `**Debug Mode! 🔧**
+
+Error fix karne ke liye batao:
+
+1. **Error message** (exact text)
+2. **Kya kar rahe the**
+3. **Language/Framework**
+4. **Code snippet**
+
+### Quick Debug Tips:
+\`\`\`
+1. Error message padho carefully
+2. Console/terminal check karo
+3. Recent changes revert karo
+4. Google/Stack Overflow search
+5. Code ko parts mein test karo
+\`\`\`
+
+Apna error paste karo! 💪`
+  },
+  {
+    keywords: ["career", "job", "naukri", "placement", "salary", "interview"],
+    response: `**Career Guidance! 🎯**
+
+### Hot Tech Careers:
+| Field | Salary | Skills |
+|-------|--------|--------|
+| Full-Stack | 8-25 LPA | JS, React, Node |
+| Data Science | 10-30 LPA | Python, ML |
+| Cloud | 8-20 LPA | AWS/Azure |
+| Cybersecurity | 8-25 LPA | Security |
+| AI/ML | 12-35 LPA | Python, DL |
+
+### Tips:
+1. Skills > Degree
+2. Projects banao
+3. GitHub strong rakho
+4. LinkedIn active
+5. DSA practice
+
+Kaunsa field? Roadmap dunga! 📈`
+  },
+  {
+    keywords: ["project", "idea", "banau kya", "build", "create"],
+    response: `**Project Ideas! 💡**
+
+### Beginner:
+- Portfolio website
+- To-do app
+- Calculator
+- Weather app (API)
+
+### Intermediate:
+- Blog platform
+- E-commerce page
+- Chat app
+- URL shortener
+
+### Advanced:
+- Social media clone
+- AI chatbot
+- Real-time collab tool
+- Video streaming
+
+Skill level batao — specific suggest karunga! 🚀`
+  },
+  {
+    keywords: ["api", "rest", "fetch", "axios", "http"],
+    response: `**API Development! 🔌**
+
+### REST API Basics:
+\`\`\`javascript
+// GET Request
+const response = await fetch('/api/users');
+const data = await response.json();
+
+// POST Request
+await fetch('/api/users', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'User' })
+});
+\`\`\`
+
+### HTTP Methods:
+| Method | Use |
+|--------|-----|
+| GET | Read data |
+| POST | Create |
+| PUT | Update (full) |
+| PATCH | Update (partial) |
+| DELETE | Remove |
+
+API banana hai ya consume karna hai? 🎯`
+  },
+  {
+    keywords: ["git", "github", "version control", "commit", "push"],
+    response: `**Git & GitHub! 📦**
+
+### Essential Commands:
+\`\`\`bash
+git init                    # Initialize
+git add .                   # Stage all
+git commit -m "message"     # Commit
+git push origin main        # Push
+git pull                    # Pull changes
+git branch feature          # New branch
+git checkout feature        # Switch branch
+git merge feature           # Merge
+\`\`\`
+
+### Workflow:
+1. Fork/Clone repo
+2. Create feature branch
+3. Make changes
+4. Commit with clear message
+5. Push & create PR
+
+GitHub profile strong rakho — recruiters dekhte hain! 🚀`
+  }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GPT API INTEGRATION (Via Secure Proxy)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Call GPT API through secure backend proxy
+ * ⚠️ Never expose API keys in frontend!
+ */
+async function callGPTAPI(message, history = []) {
+  if (!CONFIG.GPT_API_ENABLED || !CONFIG.GPT_API_ENDPOINT) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(CONFIG.GPT_API_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: message,
+        history: history.slice(-10), // Last 10 messages for context
+        user: getCurrentUser()?.name || "User"
+      })
+    });
+
+    if (!response.ok) {
+      console.warn("GPT API error, falling back to internal KB");
+      return null;
+    }
+
+    const data = await response.json();
+    return data.response || data.message || null;
+
+  } catch (error) {
+    console.warn("GPT API call failed:", error);
+    return null;
+  }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// RESPONSE GENERATION
+// ═══════════════════════════════════════════════════════════════════════════
 
+function searchKnowledge(query) {
+  const lower = query.toLowerCase();
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const entry of knowledgeBase) {
+    const matchCount = entry.keywords.filter(kw => lower.includes(kw)).length;
+    if (matchCount > bestScore) {
+      bestScore = matchCount;
+      bestMatch = entry;
+    }
+  }
+
+  return bestMatch ? bestMatch.response : null;
+}
+
+function generateContextualResponse(message) {
+  const lower = message.toLowerCase();
+
+  if (lower.includes("code") || lower.includes("program") || lower.includes("function")) {
+    return `**Code Help! 💻**
+
+Coding mein help ke liye batao:
+1. **Language** — Python, JS, Java?
+2. **Kya banana hai** — Function, class?
+3. **Context** — Web, data, automation?
+
+Ya seedha poochho jaise:
+- "Python mein list sort karo"
+- "JS mein API call kaise karein"
+
+Poochho! 🚀`;
+  }
+
+  if (lower.includes("seekh") || lower.includes("learn") || lower.includes("start")) {
+    return `**Learning Path! 📚**
+
+Kya seekhna hai specifically?
+
+### Approach:
+1. **Foundation** — Basics samjho
+2. **Practice** — Daily coding
+3. **Build** — Projects banao
+4. **Share** — Portfolio
+
+Technology batao — detailed roadmap dunga! 🎯`;
+  }
+
+  return null;
+}
+
+/**
+ * Main response generator
+ * Priority: GPT API > Internal KB > Contextual > Fallback
+ */
+async function generateAIResponse(message, history = [], memories = []) {
+  // Try GPT API first (if enabled)
+  if (CONFIG.GPT_API_ENABLED) {
+    const gptResponse = await callGPTAPI(message, history);
+    if (gptResponse) {
+      return gptResponse;
+    }
+  }
+
+  // Fallback to internal knowledge base
+  if (CONFIG.USE_INTERNAL_KB) {
+    const kbResponse = searchKnowledge(message);
+    if (kbResponse) {
+      return kbResponse;
+    }
+
+    const contextual = generateContextualResponse(message);
+    if (contextual) {
+      return contextual;
+    }
+  }
+
+  // Final fallback
+  return `Interesting question! 🤔
+
+Mujhe thoda detail chahiye:
+1. Specifically kya jaanna hai?
+2. Context kya hai?
+3. Koi example?
+
+Main tech, coding, cybersecurity, career pe help kar sakta hoon!
+
+Ya [AK Industries](${CONFIG.AK_CONTACT_URL}) ko contact karo. 📩`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MARKDOWN RENDERING
+// ═══════════════════════════════════════════════════════════════════════════
+
+function renderMarkdown(text) {
+  let html = text;
+
+  // Code blocks
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+    const escaped = code.trim().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return `<div class="code-block-wrapper"><div class="code-block-header"><span class="code-lang">${lang || "code"}</span><button class="copy-code-btn" onclick="copyCode(this)">📋 Copy</button></div><pre><code>${escaped}</code></pre></div>`;
+  });
+
+  // Tables
+  html = html.replace(/\|(.+)\|\n\|[-|]+\|\n((?:\|.+\|\n?)+)/g, (match, header, body) => {
+    const headers = header.split('|').filter(h => h.trim()).map(h => `<th>${h.trim()}</th>`).join('');
+    const rows = body.trim().split('\n').map(row => {
+      const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+      return `<tr>${cells}</tr>`;
+    }).join('');
+    return `<table><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>`;
+  });
+
+  // Inline code, headings, bold, italic, links, blockquotes, lists
+  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
+  html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
+  html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
+  html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  html = html.replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>");
+  html = html.replace(/^[*-] (.+)$/gm, "<li>$1</li>");
+  html = html.replace(/((?:<li>.*<\/li>\s*)+)/g, "<ul>$1</ul>");
+  html = html.replace(/^---$/gm, "<hr>");
+  html = html.replace(/\n\n/g, "</p><p>");
+  html = html.replace(/\n/g, "<br>");
+
+  if (!html.startsWith("<")) {
+    html = `<p>${html}</p>`;
+  }
+
+  return html;
+}
+
+function copyCode(btn) {
+  const code = btn.closest(".code-block-wrapper").querySelector("code");
+  if (code) {
+    navigator.clipboard.writeText(code.textContent || "");
+    btn.textContent = "✅ Copied!";
+    setTimeout(() => btn.textContent = "📋 Copy", 2000);
+  }
+}
+window.copyCode = copyCode;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHAT OPERATIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+function addMessage(role, content) {
+  const msg = {
+    id: `${role}-${Date.now()}`,
+    role: role,
+    content: content,
+    timestamp: new Date()
+  };
+  chatMessages.push(msg);
+  
+  if (currentSessionId) {
+    saveChatLocally(currentSessionId, chatMessages);
+  }
+  return msg;
+}
+
+async function sendMessage(message) {
+  addMessage("user", message);
+  
+  const user = getCurrentUser();
+  const response = await generateAIResponse(message, chatMessages, user.memories || []);
+  
+  return addMessage("assistant", response);
+}
+
+function startNewChat() {
+  currentSessionId = `session-${Date.now()}`;
+  chatMessages = [];
+}
+
+function loadChatSession(sessionId) {
+  const chats = loadChatsLocally();
+  if (chats[sessionId]) {
+    currentSessionId = sessionId;
+    chatMessages = chats[sessionId].messages || [];
+    return chatMessages;
+  }
+  return [];
+}
+
+function getChatSessions() {
+  const chats = loadChatsLocally();
+  return Object.keys(chats).map(id => ({
+    id: id,
+    title: chats[id].messages?.[0]?.content?.substring(0, 40) || "New Chat",
+    updatedAt: chats[id].updatedAt
+  })).sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+}
+
+function deleteChatSession(sessionId) {
+  deleteChatLocally(sessionId);
+  if (currentSessionId === sessionId) startNewChat();
+}
+
+function formatTime(date) {
+  return new Date(date).toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  });
+}
+
+console.log("✅ Chat engine loaded");
