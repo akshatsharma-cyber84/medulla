@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- ════════════════════════════════════════════════════════════════════════
+   MEDULLA AI – Intelligent Assistant
+   GitHub Pages Compatible | Single Page Application
+   Built by AK Industries
+   ═══════════════════════════════════════════════════════════════════════════ -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Medulla AI - Intelligent Assistant by AK Industries. Tech, coding, cybersecurity help in Hinglish.">
+  <meta name="author" content="AK Industries">
+  <meta name="theme-color" content="#050510">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Medulla AI – Intelligent Assistant">
+  <meta property="og:description" content="Your AI buddy for tech, coding, and cybersecurity. Speaks Hinglish!">
+  <meta property="og:type" content="website">
+  
+  <title>Medulla AI – Intelligent Assistant by AK Industries</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+   BACKGROUND EFFECTS
+   ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="bg-layer">
+    <div class="bg-mesh"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-pattern"></div>
+    <div class="particles" id="particles-container"></div>
+  </div>
+  <div class="glow-light" id="glow-light"></div>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+   LOADING SCREEN
+   ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="loading-screen" id="loading-screen">
+    <div class="loading-logo">
+      <span class="brain-icon">🧠</span>
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+      <div class="ring ring-glow"></div>
+    </div>
+    <div class="loading-title">MEDULLA AI</div>
+    <div class="loading-subtitle">by AK Industries</div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+   LOGIN SCREEN
+   ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="login-screen hidden" id="login-screen">
+    <div class="login-card">
+      <div class="login-logo">🧠</div>
+      <div class="login-title">Medulla AI</div>
+      <div class="login-subtitle">Intelligent Assistant by AK Industries</div>
+      
+      <input type="text" class="login-input" id="name-input" placeholder="👤 Your Name" autocomplete="name">
+      <input type="tel" class="login-input" id="phone-input" placeholder="📱 Phone Number" autocomplete="tel">
+      
+      <button class="login-btn" id="login-btn">🚀 Continue to Medulla AI</button>
+      <div class="login-error" id="login-error"></div>
+      
+      <a href="https://akshatsharma-cyber84.github.io/AK_world" target="_blank" rel="noopener" class="login-link">
+        🌐 Visit AK Industries
+      </a>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+   MAIN APPLICATION
+   ═══════════════════════════════════════════════════════════════════════════ -->
+  <div class="app-wrapper" id="app-wrapper">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-logo">🧠</span>
+        <span class="sidebar-title">Medulla AI</span>
+      </div>
+      
+      <button class="new-chat-btn" id="new-chat-btn">✨ New Chat</button>
+      
+      <div class="sidebar-section-title">Chat History</div>
+      <div class="chat-history" id="chat-history">
+        <div style="color:var(--text-muted);font-size:13px;padding:12px;text-align:center;">No previous chats</div>
+      </div>
+      
+      <div class="sidebar-bottom">
+        <button class="sidebar-bottom-btn" id="memory-btn">🧠 Memory Config</button>
+        <button class="sidebar-bottom-btn" id="settings-btn">⚙️ Settings</button>
+        <button class="sidebar-bottom-btn" id="about-btn">ℹ️ About Medulla</button>
+      </div>
+    </aside>
+
+    <!-- CHAT MAIN -->
+    <main class="chat-main">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+          <div class="chat-header-info">
+            <div class="chat-header-title">Medulla AI</div>
+            <div class="chat-header-status">
+              <span class="status-dot"></span>
+              Online • Ready to assist
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chat-messages">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcome-screen">
+          <div class="welcome-badge" id="welcome-badge" style="display:none;">✨ Welcome back!</div>
+          <div class="welcome-icon">🧠</div>
+          <div class="welcome-title" id="welcome-title">Welcome to Medulla AI!</div>
+          <div class="welcome-text" id="welcome-text">
+            Main hoon tumhara AI buddy! Tech, coding, cybersecurity, ya kuch bhi poochho — Hinglish mein help karunga. 🚀
+          </div>
+          
+          <div class="suggestion-grid">
+            <div class="suggestion-card" onclick="handleSuggestion('Bhai Linux seekhna hai')">
+              <div class="suggestion-emoji">🐧</div>
+              <div class="suggestion-text">Linux seekhna hai — kahan se start karu?</div>
+            </div>
+            <div class="suggestion-card" onclick="handleSuggestion('Python mein kya bana sakte hain?')">
+              <div class="suggestion-emoji">🐍</div>
+              <div class="suggestion-text">Python mein kya kya bana sakte hain?</div>
+            </div>
+            <div class="suggestion-card" onclick="handleSuggestion('Cybersecurity mein career kaise start karu?')">
+              <div class="suggestion-emoji">🔒</div>
+              <div class="suggestion-text">Cybersecurity career roadmap chahiye</div>
+            </div>
+            <div class="suggestion-card" onclick="handleSuggestion('Medulla AI kaun hai?')">
+              <div class="suggestion-emoji">🤖</div>
+              <div class="suggestion-text">Medulla AI ke baare mein batao!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="typing-indicator" id="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="chat-input-container">
+          <textarea class="chat-input" id="chat-input" placeholder="Kuch bhi poochho... 💬" rows="1"></textarea>
+          <button class="send-btn" id="send-btn" title="Send">▶</button>
+        </div>
+        <div class="chat-footer">
+          Medulla AI by <a href="https://akshatsharma-cyber84.github.io/AK_world" target="_blank" rel="noopener">AK Industries</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+   MODALS
+   ═══════════════════════════════════════════════════════════════════════════ -->
+  
+  <!-- About Modal -->
+  <div class="modal-overlay" id="about-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">🧠 About Medulla AI</span>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Medulla AI</strong> is an intelligent assistant by <strong>AK Industries</strong>.</p>
+        <h3>🚀 Features</h3>
+        <p>
+          • <strong>Hinglish AI</strong> — Natural conversation<br>
+          • <strong>Smart Memory</strong> — Remembers preferences<br>
+          • <strong>Tech Expert</strong> — Programming, Security, Linux<br>
+          • <strong>Code Assist</strong> — Syntax highlighting
+        </p>
+        <h3>🏢 AK Industries</h3>
+        <p><a href="https://akshatsharma-cyber84.github.io/AK_world" target="_blank">🌐 Visit Website</a></p>
+        <p style="margin-top:20px;font-size:12px;color:var(--text-muted);">Version 2.0 • GitHub Pages Edition</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">⚙️ Settings</span>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <h3>👤 User Profile</h3>
+        <p id="settings-user-info">Loading...</p>
+        <h3>🎨 Theme</h3>
+        <p>Deep Space with glassmorphism effects.</p>
+        <h3>🔮 Coming Soon</h3>
+        <p>• Voice input<br>• Image analysis<br>• Custom themes</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Memory Modal -->
+  <div class="modal-overlay" id="memory-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">🧠 Memory Config</span>
+        <button class="modal-close">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Medulla remembers your interests to personalize responses.</p>
+        <h3 style="margin-bottom:16px;">Stored Memories</h3>
+        <div id="memory-list">
+          <div class="memory-empty">🔮 No memories yet. Start chatting!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+   JAVASCRIPT (Order Matters!)
+   ═══════════════════════════════════════════════════════════════════════════ -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/supabase.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/chat.js"></script>
+  <script src="assets/js/memory.js"></script>
+  <script src="assets/js/app.js"></script>
+
+</body>
+</html>
