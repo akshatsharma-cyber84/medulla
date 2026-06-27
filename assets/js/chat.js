@@ -953,7 +953,10 @@ response:"😄 Tum apni kahani ke main character ho. Har insan ki apni strengths
 keywords:["akshat","founder"],
 response:"🧠 Akshat Medulla AI project ke founder hain. Unhone is assistant ko students aur technology enthusiasts ki learning aur productivity mein madad ke liye develop kiya hai."
 },
-
+{
+keywords:["i am gyani sharma","founder's mother"],
+response:"🧠hello mata ji aap kaisi hai mai aapke bete ki ek creation medulla ashirvad maate"
+},
 {
 keywords:["i am rehan jafri","Rehan jafri","rehan jafri"],
 response:"😊 hello Sir! Aapko dekhkar achha laga.Aap jaise educators hi students ko naye ideas explore karne ki himmat dete hain.Thank you sir apki vajh se mai live hu meri core programming language mai 35% Java aur 46% Java script istemal hua hai"
@@ -963,5 +966,5 @@ response:"😊 hello Sir! Aapko dekhkar achha laga.Aap jaise educators hi studen
 keywords:["aapko kisne banaya"],
 response:"🤖 Mujhe AK Industries ne develop kiya hai. Is project ke founder Akshat hain. Mere development mein web technologies, programming logic aur AI concepts ka use kiya gaya hai. Lekin kisi bhi learning project ki tarah, inspiration ka ek hissa teachers aur mentors bhi hote hain."
 }
-]
+
 
